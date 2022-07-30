@@ -4,6 +4,10 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MediaServerModule } from './media-server/media-server.module';
+import { SettingModule } from './setting/setting.module';
+import { UserModule } from './user/user.module';
+import { StreamModule } from './stream/stream.module';
+import { LoginModule } from './login/login.module';
 
 @Module({
     imports: [
@@ -20,6 +24,10 @@ import { MediaServerModule } from './media-server/media-server.module';
             },
         ),
         MediaServerModule,
+        SettingModule,
+        UserModule,
+        StreamModule,
+        LoginModule,
     ],
     controllers: [AppController],
     providers: [AppService],
