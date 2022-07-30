@@ -5,7 +5,7 @@ import { Document } from 'mongoose';
 export class RTMPConfig {
     @Prop({ required: true })
     name: string;
-    @Prop({ required: true })
+    @Prop({ required: true, type: 'object' })
     rtmp_server: {
         rtmp: {
             port: number;

@@ -9,8 +9,8 @@ export class User {
     username: string;
     @Prop({ required: true })
     password: string;
-    @Prop({ required: true })
-    token: string;
+    @Prop({ default: null })
+    token: string | null;
     @Prop({
         default: null,
         ref: () => Stream,
