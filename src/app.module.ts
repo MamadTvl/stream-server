@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { MediaServerModule } from './media-server/media-server.module';
 
 @Module({
     imports: [
@@ -18,6 +19,7 @@ import { MongooseModule } from '@nestjs/mongoose';
                 authSource: process.env.MONGO_AUTH_SOURCE,
             },
         ),
+        MediaServerModule,
     ],
     controllers: [AppController],
     providers: [AppService],
