@@ -1,7 +1,7 @@
+import { Stream } from './Stream.schema';
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import shortid from 'shortid';
 
 @Schema({ timestamps: true })
 export class User {
@@ -11,8 +11,12 @@ export class User {
     password: string;
     @Prop({ required: true })
     token: string;
-    @Prop()
-    streamKey: string;
+    @Prop({
+        default: null,
+        ref: () => Stream,
+        type: MongooseSchema.Types.ObjectId,
+    })
+    stream: MongooseSchema.Types.ObjectId;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
@@ -25,9 +29,5 @@ UserSchema.methods.validPassword = function (password: string) {
 
 UserSchema.methods.validToken = function (token: string) {
     return bcrypt.compareSync(token, this.token);
-};
-
-UserSchema.methods.generateStreamKey = () => {
-    return shortid.generate();
 };
 export type UserDocument = User & Document;
