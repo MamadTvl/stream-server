@@ -1,5 +1,5 @@
 import { RTMPConfig, RTMPConfigDocument } from './../schema/Config.schema';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import NodeMediaServer from 'node-media-server';
 import { Model } from 'mongoose';
@@ -12,6 +12,9 @@ export class MediaServerService {
     ) {}
 
     public listen() {
+        if (this.server) {
+            throw new BadRequestException('Server already running!');
+        }
         this.init();
     }
 
