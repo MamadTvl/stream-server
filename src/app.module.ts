@@ -8,6 +8,7 @@ import { SettingModule } from './setting/setting.module';
 import { UserModule } from './user/user.module';
 import { StreamModule } from './stream/stream.module';
 import { LoginModule } from './login/login.module';
+import { User, UserSchema } from './schema/User.schema';
 
 @Module({
     imports: [
@@ -23,6 +24,12 @@ import { LoginModule } from './login/login.module';
                 authSource: process.env.MONGO_AUTH_SOURCE,
             },
         ),
+        MongooseModule.forFeature([
+            {
+                name: User.name,
+                schema: UserSchema,
+            },
+        ]),
         MediaServerModule,
         SettingModule,
         UserModule,
