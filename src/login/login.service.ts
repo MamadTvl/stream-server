@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
+import { createHash } from 'crypto';
 
 @Injectable()
 export class LoginService {
@@ -28,11 +29,15 @@ export class LoginService {
     }
 
     public async getToken(username: string, password: string): Promise<string> {
-        const user = await this.getUser(username, password);
+        await this.getUser(username, password);
         const token = uuidv4();
         await this.userModel.updateOne(
             { username: username },
-            { $set: { token: bcrypt.hashSync(token, bcrypt.genSaltSync(8)) } },
+            {
+                $set: {
+                    token: createHash('sha256').update(token).digest('hex'),
+                },
+            },
         );
         return token;
     }
