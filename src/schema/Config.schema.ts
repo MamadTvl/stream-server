@@ -9,10 +9,10 @@ export class RTMPConfig {
     rtmp_server: {
         rtmp: {
             port: number;
-            chunk_size: 60000;
+            chunk_size: number;
             gop_cache: true;
-            ping: 60;
-            ping_timeout: 30;
+            ping: number;
+            ping_timeout: number;
         };
         http: {
             port: number;

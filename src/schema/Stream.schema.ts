@@ -12,6 +12,8 @@ export class Stream {
     public: boolean;
     @Prop({ required: true })
     expireDate: number;
+    @Prop({ required: true, default: false })
+    active: boolean;
 }
 
 export const StreamSchema = SchemaFactory.createForClass(Stream);
