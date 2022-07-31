@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 
 @Schema({ timestamps: true })
 export class User {
+    _id: MongooseSchema.Types.ObjectId;
     @Prop({ required: true, unique: true, index: true })
     username: string;
     @Prop({ required: true })
@@ -12,22 +13,12 @@ export class User {
     @Prop({ default: null })
     token: string | null;
     @Prop({
-        default: null,
-        ref: () => Stream,
-        type: MongooseSchema.Types.ObjectId,
+        default: [],
+        type: [{ type: MongooseSchema.Types.ObjectId, ref: Stream.name }],
     })
-    stream: MongooseSchema.Types.ObjectId;
+    streams: Stream[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
-UserSchema.methods.generateHash = (str: string) => {
-    return bcrypt.hashSync(str, bcrypt.genSaltSync(8));
-};
-UserSchema.methods.validPassword = function (password: string) {
-    return bcrypt.compareSync(password, this.password);
-};
 
-UserSchema.methods.validToken = function (token: string) {
-    return bcrypt.compareSync(token, this.token);
-};
 export type UserDocument = User & Document;

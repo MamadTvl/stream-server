@@ -1,6 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import shortid from 'shortid';
 
 @Schema({ timestamps: true })
 export class Stream {
@@ -12,14 +11,8 @@ export class Stream {
     public: boolean;
     @Prop({ required: true })
     expireDate: number;
-    @Prop({ required: true, default: false })
-    active: boolean;
 }
 
 export const StreamSchema = SchemaFactory.createForClass(Stream);
-
-StreamSchema.methods.generateStreamKey = () => {
-    return shortid.generate();
-};
 
 export type StreamDocument = Stream & Document;

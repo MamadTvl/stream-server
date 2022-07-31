@@ -37,6 +37,8 @@ export class RTMPConfig {
     };
     @Prop({ required: true, default: true })
     default: boolean;
+    @Prop({ default: false })
+    active: boolean;
 }
 
 export const RTMPConfigSchema = SchemaFactory.createForClass(RTMPConfig);
