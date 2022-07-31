@@ -8,6 +8,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Request, Response, NextFunction } from 'express';
 import { Model } from 'mongoose';
 import { createHash } from 'crypto';
+import { Stream } from 'src/schema/Stream.schema';
 
 export interface AuthRequest extends Request {
     user: User | null;
@@ -20,9 +21,20 @@ export class AuthorizationMiddleware implements NestMiddleware {
     ) {}
     async use(req: AuthRequest, res: Response, next: NextFunction) {
         const token = req.headers.authorization;
-        const user = await this.userModel.findOne({
-            token: createHash('sha256').update(token).digest('hex'),
-        });
+        if (!token) {
+            throw new UnauthorizedException();
+        }
+        const user = await this.userModel.findOne(
+            {
+                token: createHash('sha256').update(token).digest('hex'),
+            },
+            {},
+            {
+                populate: {
+                    path: 'streams',
+                },
+            },
+        );
         if (!user) {
             throw new UnauthorizedException();
         }
