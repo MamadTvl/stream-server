@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
     ArrayNotEmpty,
     IsArray,
@@ -8,6 +9,7 @@ import {
     IsObject,
     IsString,
     ValidateIf,
+    ValidateNested,
 } from 'class-validator';
 
 class RTMP {
@@ -54,22 +56,32 @@ class Trans {
     ffmpeg: string;
     @IsDefined()
     @ArrayNotEmpty()
-    @IsArray({ each: true })
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => Task)
     tasks: Task[];
 }
 
 class RTMPServer {
     @IsDefined()
-    @IsObject({ each: true })
+    @IsObject()
+    @ValidateNested()
+    @Type(() => RTMP)
     rtmp: RTMP;
     @IsDefined()
-    @IsObject({ each: true })
+    @IsObject()
+    @ValidateNested()
+    @Type(() => Http)
     http: Http;
     @ValidateIf((obj) => !!obj.auth)
-    @IsObject({ each: true })
+    @IsObject()
+    @ValidateNested()
+    @Type(() => Auth)
     auth?: Auth;
     @IsDefined()
-    @IsObject({ each: true })
+    @IsObject()
+    @ValidateNested()
+    @Type(() => Trans)
     trans: Trans;
 }
 
@@ -78,7 +90,9 @@ export class RTMPConfigDTO {
     @IsString()
     name: string;
     @IsDefined()
-    @IsObject({ each: true })
+    @IsObject()
+    @ValidateNested()
+    @Type(() => RTMPServer)
     rtmp_server: RTMPServer;
     @IsDefined()
     @IsBoolean()

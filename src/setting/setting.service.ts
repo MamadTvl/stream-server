@@ -29,12 +29,12 @@ export class SettingService {
             rtmp_server: {
                 rtmp: {
                     ...data.rtmp_server.rtmp,
-                    port: process.env.RTMP_PORT,
+                    port: +process.env.RTMP_PORT,
                 },
                 http: {
                     ...data.rtmp_server.http,
-                    media: './media',
-                    port: process.env.HTTP_PORT,
+                    mediaroot: './media',
+                    port: +process.env.HTTP_PORT,
                 },
                 auth: {
                     ...data.rtmp_server.auth,
@@ -45,7 +45,7 @@ export class SettingService {
                     tasks: data.rtmp_server.trans.tasks,
                 },
             },
-            default: data.name,
+            default: data.default,
         });
         await this.configModel.create(config);
     }

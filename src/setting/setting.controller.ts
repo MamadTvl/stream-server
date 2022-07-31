@@ -32,15 +32,18 @@ export class SettingController {
         throw new BadRequestException('Method not implemented yet');
     }
 
-    @Patch('rmtp/action/:name')
+    @Patch('rtmp/action/:name')
     async startStream(
         @Body() body: RTMPActionDTO,
         @Param('name') name?: string,
     ) {
         if (body.action === RTMPAction.listen) {
-            this.settingService.mediaServer.listen(name);
+            await this.settingService.mediaServer.listen(name);
         } else if (body.action === RTMPAction.close) {
-            this.settingService.mediaServer.close();
+            await this.settingService.mediaServer.close();
         }
+        return {
+            message: 'ok',
+        };
     }
 }
