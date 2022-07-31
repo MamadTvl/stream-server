@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -6,9 +6,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MediaServerModule } from './media-server/media-server.module';
 import { SettingModule } from './setting/setting.module';
 import { UserModule } from './user/user.module';
-import { StreamModule } from './stream/stream.module';
 import { LoginModule } from './login/login.module';
 import { User, UserSchema } from './schema/User.schema';
+import { AuthorizationMiddleware } from './common/middleware/authorization.middleware';
 
 @Module({
     imports: [
@@ -22,6 +22,11 @@ import { User, UserSchema } from './schema/User.schema';
                     password: process.env.MONGO_PASSWORD,
                 },
                 authSource: process.env.MONGO_AUTH_SOURCE,
+                connectionFactory: (connection) => {
+                    // eslint-disable-next-line @typescript-eslint/no-var-requires
+                    connection.plugin(require('mongoose-autopopulate'));
+                    return connection;
+                },
             },
         ),
         MongooseModule.forFeature([
@@ -33,10 +38,13 @@ import { User, UserSchema } from './schema/User.schema';
         MediaServerModule,
         SettingModule,
         UserModule,
-        StreamModule,
         LoginModule,
     ],
     controllers: [AppController],
     providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(AuthorizationMiddleware).forRoutes('*');
+    }
+}
