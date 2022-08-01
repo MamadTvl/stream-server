@@ -5,6 +5,9 @@ import NodeMediaServer from 'node-media-server';
 import { Model } from 'mongoose';
 import { Stream } from 'stream';
 import { StreamDocument } from 'src/schema/Stream.schema';
+import { User, UserDocument } from 'src/schema/User.schema';
+import { createHash } from 'crypto';
+import moment from 'moment';
 @Injectable()
 export class MediaServerService {
     private server: NodeMediaServer | undefined;
@@ -15,11 +18,28 @@ export class MediaServerService {
         public rtmpConfigModel: Model<RTMPConfigDocument>,
         @InjectModel(Stream.name)
         public streamModel: Model<StreamDocument>,
+        @InjectModel(User.name) public userModel: Model<UserDocument>,
     ) {}
 
     static getStreamKeyFromStreamPath(path: string): string {
         const parts = path.split('/');
         return parts.at(-1);
+    }
+
+    static getQueryParams(name: string, url: string): string | null {
+        name = name.replace(/[\[\]]/g, '\\$&');
+        const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+
+    private reject(id: string): void {
+        const session = this.server.getSession(id);
+        // bug that should be fixed by them
+        // @ts-ignore
+        session.reject();
     }
 
     private bindEvent() {
@@ -28,22 +48,44 @@ export class MediaServerService {
                 `preConnect:  id=${id} args=${JSON.stringify(args)}`,
             );
         });
-        this.server.on('prePublish', async (id, StreamPath, args) => {
-            this.logger.log(
-                `prePublish: id=${id} StreamPath=${StreamPath} args=${JSON.stringify(
-                    args,
-                )}`,
-            );
-            const streamKey =
-                MediaServerService.getStreamKeyFromStreamPath(StreamPath);
-            const stream = await this.streamModel.findOne({ key: streamKey });
-            if (!stream) {
-                const session = this.server.getSession(id);
-                // bug that should be fixed by them
-                // @ts-ignore
-                session.reject();
-            }
-        });
+        this.server.on(
+            'prePublish',
+            async (id, StreamPath, args: { token: string }) => {
+                this.logger.log(
+                    `prePublish: id=${id} StreamPath=${StreamPath} args=${JSON.stringify(
+                        args,
+                    )}`,
+                );
+                const streamKey =
+                    MediaServerService.getStreamKeyFromStreamPath(StreamPath);
+                const token = args.token;
+                if (!token) {
+                    this.reject(id);
+                    return;
+                }
+                const user = await this.userModel.findOne(
+                    {
+                        token: createHash('sha256').update(token).digest('hex'),
+                    },
+                    {},
+                    {
+                        populate: {
+                            path: 'streams',
+                        },
+                    },
+                );
+                const stream = user?.streams.find(
+                    (item) => item.key === streamKey,
+                );
+                const now = moment().unix();
+                if (now > stream.expireDate) {
+                    this.reject(id);
+                }
+                if (!stream) {
+                    this.reject(id);
+                }
+            },
+        );
     }
 
     public async listen(name?: string | undefined) {
@@ -53,7 +95,9 @@ export class MediaServerService {
         const config: RTMPConfig = await this.rtmpConfigModel.findOne({
             ...(name ? { name: name } : { default: true }),
         });
-        // TODO: what if config is null
+        if (!config) {
+            throw new BadRequestException(`${name} does not exists`);
+        }
         this.activeServerName = config.name;
         await this.rtmpConfigModel.updateOne(
             {

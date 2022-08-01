@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Module } from '@nestjs/common';
 import { MediaServerService } from './media-server.service';
 import { Stream } from 'src/schema/Stream.schema';
+import { User, UserSchema } from 'src/schema/User.schema';
 
 @Module({
     providers: [MediaServerService],
@@ -16,6 +17,10 @@ import { Stream } from 'src/schema/Stream.schema';
             {
                 name: Stream.name,
                 schema: StreamSchema,
+            },
+            {
+                name: User.name,
+                schema: UserSchema,
             },
         ]),
     ],
