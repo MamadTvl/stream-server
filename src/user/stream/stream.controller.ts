@@ -2,7 +2,6 @@ import {
     Controller,
     Get,
     Param,
-    Patch,
     Post,
     Req,
     NotFoundException,
@@ -26,9 +25,10 @@ export class StreamController {
             throw new NotFoundException('Stream not found');
         }
         return {
-            stream,
-            url: await this.streamService.getRmtpUrl(stream),
             message: 'stream found',
+            stream,
+            url: await this.streamService.getRmtpUrl(),
+            streamKey: `${stream.key}?token=<YOUR_ACCESS_TOKEN>`,
         };
     }
 

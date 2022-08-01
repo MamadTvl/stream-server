@@ -23,18 +23,15 @@ export class StreamService {
         return user.streams.find((item) => item.name === streamName);
     }
 
-    public async getRmtpUrl(stream: Stream) {
+    public async getRmtpUrl() {
         const config = await this.configModel.findOne({
             active: true,
         });
         if (!config) {
             throw new BadRequestException('Cannot found active rmtp server');
         }
-        return `rtmp://${process.env.RMTP_BASE_URL}/live/stream?sign=${
-            stream.expireDate
-        }-${md5(
-            `/live/stream-${stream.expireDate}-${config.rtmp_server.auth.secret}`,
-        )}`;
+        const appName = config.rtmp_server.trans.tasks[0].app;
+        return `rtmp://${process.env.RMTP_BASE_URL}/${appName}`;
     }
 
     public async addStream(user: User, data: StreamDTO) {
