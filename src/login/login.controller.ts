@@ -1,11 +1,12 @@
 import { LoginDTO } from './login.dto';
 import { Body, Controller, NotFoundException, Post } from '@nestjs/common';
 import { LoginService } from './login.service';
-
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+@ApiTags('login')
 @Controller('login')
 export class LoginController {
     constructor(private readonly loginService: LoginService) {}
-
+    @ApiOperation({ summary: 'get access token' })
     @Post()
     async login(@Body() body: LoginDTO) {
         return {
@@ -16,7 +17,6 @@ export class LoginController {
             ),
         };
     }
-
     @Post('startup')
     async startup(@Body() body: LoginDTO) {
         if ((await this.loginService.userModel.count()) > 0) {

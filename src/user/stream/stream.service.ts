@@ -35,6 +35,11 @@ export class StreamService {
     }
 
     public async addStream(user: User, data: StreamDTO) {
+        if ((await this.streamModel.count({ name: data.name })) > 0) {
+            throw new BadRequestException(
+                `duplicate name is not valid [got: "${data.name}"]`,
+            );
+        }
         const stream = new this.streamModel({
             name: data.name,
             expireDate: data.expireDate,
