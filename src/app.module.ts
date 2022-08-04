@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -45,6 +45,12 @@ import { AuthorizationMiddleware } from './common/middleware/authorization.middl
 })
 export class AppModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(AuthorizationMiddleware).forRoutes('*');
+        consumer
+            .apply(AuthorizationMiddleware)
+            .exclude(
+                { path: 'login', method: RequestMethod.POST },
+                { path: 'login/startup', method: RequestMethod.POST },
+            )
+            .forRoutes('*');
     }
 }
