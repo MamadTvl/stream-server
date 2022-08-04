@@ -1,6 +1,6 @@
 version: '3'
 services:
-    prod:
+    stream-server:
         container_name: stream-server
         image: stream-server:1.0.0
         build:
@@ -31,6 +31,14 @@ services:
             - MONGO_AUTH_SOURCE=${MONGO_AUTH_SOURCE}
             - FFMPEG=${FFMPEG}
 
+    stream-nginx:
+        container_name: nginx
+        image: nginx
+        build:
+            context: ./nginx
+        restart: always
+        ports:
+            - "80:80"
     mongodb:
         image: mongo:latest
         container_name: mongodb
