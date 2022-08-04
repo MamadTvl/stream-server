@@ -50,6 +50,7 @@ export class AppModule {
             .exclude(
                 { path: 'login', method: RequestMethod.POST },
                 { path: 'login/startup', method: RequestMethod.POST },
+                'docs',
             )
             .forRoutes('*');
     }
