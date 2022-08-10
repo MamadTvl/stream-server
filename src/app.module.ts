@@ -53,7 +53,7 @@ export class AppModule {
                 { path: '(.*)login', method: RequestMethod.POST },
                 { path: '(.*)login/startup', method: RequestMethod.POST },
                 'docs',
-                '(.*)stream(.*)',
+                '/api/stream(.*)',
             )
             .forRoutes('*');
     }
