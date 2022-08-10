@@ -18,6 +18,7 @@ async function bootstrap() {
         .addTag('setting')
         .addTag('user/stream')
         .addTag('user')
+        .addTag('stream')
         .addSecurity('authorization', {
             type: 'apiKey',
             name: 'authorization',

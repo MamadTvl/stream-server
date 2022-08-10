@@ -9,6 +9,7 @@ import { UserModule } from './user/user.module';
 import { LoginModule } from './login/login.module';
 import { User, UserSchema } from './schema/User.schema';
 import { AuthorizationMiddleware } from './common/middleware/authorization.middleware';
+import { StreamModule } from './stream/stream.module';
 
 @Module({
     imports: [
@@ -39,6 +40,7 @@ import { AuthorizationMiddleware } from './common/middleware/authorization.middl
         SettingModule,
         UserModule,
         LoginModule,
+        StreamModule,
     ],
     controllers: [AppController],
     providers: [AppService],
@@ -48,9 +50,10 @@ export class AppModule {
         consumer
             .apply(AuthorizationMiddleware)
             .exclude(
-                { path: 'login', method: RequestMethod.POST },
-                { path: 'login/startup', method: RequestMethod.POST },
+                { path: '(.*)login', method: RequestMethod.POST },
+                { path: '(.*)login/startup', method: RequestMethod.POST },
                 'docs',
+                '(.*)stream(.*)',
             )
             .forRoutes('*');
     }

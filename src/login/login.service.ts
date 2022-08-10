@@ -15,7 +15,7 @@ export class LoginService {
     private async getUser(username: string, password: string): Promise<User> {
         const user = await this.userModel.findOne({ username: username });
         if (!user || !bcrypt.compareSync(password, user.password)) {
-            throw new BadRequestException('username or password is wrong');
+            throw new BadRequestException('invalid username or password');
         }
         return user;
     }
